@@ -52,3 +52,51 @@ VALUES
 (2, 3, '2025-01-17'), 
 (3, 1, '2025-01-11'), 
 (4, 3, '2025-01-19'); 
+
+
+select 
+    s.student_id, 
+    s.name as student_name, 
+    s.email, 
+    c.course_name, 
+    e.enrollment_date
+from enrollments e
+join students s on e.student_id = s.student_id
+join courses c on e.course_id = c.course_id
+where e.student_id in (
+    select student_id 
+    from enrollments 
+    group by student_id 
+    having count(course_id) > 1
+)
+order by s.student_id, e.enrollment_date;
+
+
+
+select 
+    s.name as student_name, 
+    s.email, 
+    e.enrollment_date, 
+    c.course_name, 
+    c.fee
+from enrollments e
+join students s on e.student_id = s.student_id
+join courses c on e.course_id = c.course_id
+where e.course_id in (
+    select course_id 
+    from enrollments e1 
+    join students s1 on e1.student_id = s1.student_id 
+    where s1.name = 'nguyen van an'
+)
+and s.name != 'nguyen van an';
+
+
+select 
+    c.course_name, 
+    c.duration, 
+    c.fee, 
+    count(e.student_id) as total_students
+from enrollments e
+join courses c on e.course_id = c.course_id
+group by c.course_id, c.course_name, c.duration, c.fee
+having count(e.student_id) > 2;
